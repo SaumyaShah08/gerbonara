@@ -184,7 +184,7 @@ class TestMerge:
                         reference_path(file_b), '--offset', '100,100', '--rotation', '0',
                         outdir, '--output-naming-scheme', 'kicad', '--output-board-name', 'foobar',
                         '--warnings', 'ignore')
-            assert (Path(outdir) / 'foobar-F.Cu.gbr').exists()
+            assert (Path(outdir) / 'foobar-F_Cu.gbr').exists()
 
 
 class TestMeta:
