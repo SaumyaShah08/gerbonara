@@ -323,7 +323,7 @@ class Region(GraphicObject):
 
     def close(self):
         if self.outline and self.outline[-1] != self.outline[0]:
-            self.outline.append(self.outline[-1])
+            self.outline.append(self.outline[0])
             if self.arc_centers:
                 self.arc_centers.append((None, (None, None)))
 

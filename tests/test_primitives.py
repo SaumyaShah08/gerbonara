@@ -194,3 +194,19 @@ def test_region_arc_segments(start_angle_deg, sweep_angle_deg, tmpfile, img_supp
         region.arc_centers.append(None)
 
         gbr.objects.append(region)
+
+def test_region_close():
+    """ Regression test for gitlab issue #18 """
+
+    go_region = Region([
+                (0, 0),
+                (100, 0),
+                (100, 100),
+                (0, 100),
+                # (0, 0),  # expected
+                ],
+            None,
+            polarity_dark=False,
+            unit=MM)
+    assert go_region.outline[-1] == go_region.outline[0]
+
