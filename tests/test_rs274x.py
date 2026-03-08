@@ -29,6 +29,8 @@ from gerbonara.cam import FileSettings
 from .image_support import *
 from .utils import *
 
+# Note: We have a testcase for gitlab issues #10/#11 in therm_1.gbr, but we can't test for that at this time because
+# gerbv chokes on that gerber file and does'nt produce any output.
 REFERENCE_FILES = [ l.strip() for l in '''
     board_outline.GKO
     example_outline_with_arcs.gbr

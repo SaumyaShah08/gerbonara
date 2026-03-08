@@ -280,7 +280,7 @@ class Moire(Primitive):
 @dataclass(frozen=True, slots=True)
 class Thermal(Primitive):
     code = 7
-    exposure : Expression
+    # Note: Thermal primitives according to spec don't have an exposure variable
     # center x/y
     x : UnitExpression
     y : UnitExpression
@@ -295,13 +295,13 @@ class Thermal(Primitive):
             x, y = rotate_point(calc.x, calc.y, -rotation, 0, 0)
             x, y = x+offset[0], y+offset[1]
 
-            dark = (bool(calc.exposure) == polarity_dark)
+            dark = True
 
             return [
                     gp.Circle(x, y, calc.d_outer/2, polarity_dark=dark),
                     gp.Circle(x, y, calc.d_inner/2, polarity_dark=not dark),
-                    gp.Rectangle(x, y, d_outer, gap_w, rotation=rotation, polarity_dark=not dark),
-                    gp.Rectangle(x, y, gap_w, d_outer, rotation=rotation, polarity_dark=not dark),
+                    gp.Rectangle(x, y, calc.d_outer, calc.gap_w, rotation=rotation, polarity_dark=not dark),
+                    gp.Rectangle(x, y, calc.gap_w, calc.d_outer, rotation=rotation, polarity_dark=not dark),
                     ]
 
     def dilate(self, offset, unit):
