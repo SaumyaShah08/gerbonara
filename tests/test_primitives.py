@@ -56,7 +56,11 @@ def object_test(tmpfile, img_support, epsilon=1e-4):
     for obj in gbr.objects:
         for primitive in obj.to_primitives(MM):
             poly = primitive.to_arc_poly()
-            arc_poly_gbr.objects.append(Region.from_arc_poly(poly))
+            region = Region.from_arc_poly(poly)
+            arc_poly_gbr.objects.append(region)
+            # Regression test for gitlab issue #17
+            assert primitive.polarity_dark == poly.polarity_dark
+            assert region.polarity_dark == poly.polarity_dark
 
     arc_poly_svg = tmpfile('ArcPoly SVG Output', '.svg')
     with open(arc_poly_svg, 'w') as f:
@@ -169,8 +173,20 @@ def test_flash_circle(x, y, aperture, tmpfile, img_support):
     lambda: ObroundAperture(4.0, 2.5, unit=MM),
     lambda: PolygonAperture(4.0, 6, unit=MM),
 ])
-def test_flash_aperture_types(aperture_type, tmpfile, img_support):
+@pytest.mark.parametrize('polarity', [True, False])
+def test_flash_aperture_types(aperture_type, polarity, tmpfile, img_support):
     """Test Flash with different aperture types."""
+
+    if aperture_type().hole_dia and not polarity:
+        # Our SVG export (intentionally, for simplicity) does not exactly conform to the Gerber spec in aperture
+        # rendering. The Gerber spec requires rendering the aperture from its primitives to an off-screen canvas, then
+        # compositing that on top of the target surface. The result is that inverted polarity, e.g. for holes, is opaque
+        # in our renders, but transparent in spec-compliant renders.
+        #
+        # We implemented it this way since any other way would be really slow (using lots of SVG masks, filters etc.),
+        # and in practical applications this is never an actual problem.
+        pytest.skip()
+
     with object_test(tmpfile, img_support, epsilon=1e-3) as gbr:
         aperture = aperture_type()
 
@@ -180,7 +196,8 @@ def test_flash_aperture_types(aperture_type, tmpfile, img_support):
             obj = Flash(
                 x=x, y=y,
                 aperture=aperture,
-                unit=MM
+                unit=MM,
+                polarity_dark=polarity
             )
             gbr.objects.append(obj)
 
@@ -219,7 +236,6 @@ def test_region_arc_segments(start_angle_deg, sweep_angle_deg, tmpfile, img_supp
 
 def test_region_close():
     """ Regression test for gitlab issue #18 """
-
     go_region = Region([
                 (0, 0),
                 (100, 0),
