@@ -396,6 +396,8 @@ class PolygonAperture(Aperture):
         rotation = self.rotation % (2*math.pi / self.n_vertices)
         if math.isclose(rotation, 0, abs_tol=1e-6):
             rotation = None
+        else:
+            rotation = math.degrees(rotation)
 
         if self.hole_dia is not None:
             return self.unit.convert_to(unit, self.diameter), self.n_vertices, rotation, self.unit.convert_to(unit, self.hole_dia)

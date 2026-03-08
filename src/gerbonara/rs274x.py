@@ -880,7 +880,8 @@ class GerberParser:
 
             # Polygon aperture rotation is specified in degrees, but radians are easier to work with
             if match['shape'] == 'P':
-                modifiers[2] = math.radians(modifiers[2])
+                if len(modifiers) > 2:
+                    modifiers[2] = math.radians(modifiers[2])
 
             new_aperture = kls(*modifiers, unit=self.file_settings.unit, attrs=tuple(self.aperture_attrs.items()),
                     original_number=number)
