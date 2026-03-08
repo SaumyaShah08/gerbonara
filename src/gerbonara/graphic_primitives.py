@@ -121,14 +121,14 @@ class ArcPoly(GraphicPrimitive):
 
     def approximate_arcs(self, max_error=1e-2, clip_max_error=True):
         outline = []
-        for p1, p2, (clockwise, center) in self.segments():
+        for (x1, y1), (x2, y2), (clockwise, (cx, cy)) in self.segments:
             if clockwise is None:
-                outline.append(p1)
+                outline.append((x1, y1))
             else:
                 outline.extend(approximate_arc(cx, cy, x1, y1, x2, y2, clockwise,
                                                max_error=max_error, clip_max_error=clip_max_error))
                 outline.pop() # remove arc end point
-        return type(self)(outline)
+        return type(self)(outline, polarity_dark=self.polarity_dark)
 
     def bounding_box(self):
         bbox = (None, None), (None, None)

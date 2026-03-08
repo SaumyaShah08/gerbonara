@@ -53,14 +53,20 @@ def object_test(tmpfile, img_support, epsilon=1e-4):
 
     # test primitive to_arc_poly
     arc_poly_gbr = GerberFile()
+    arc_poly_approx_gbr = GerberFile()
     for obj in gbr.objects:
         for primitive in obj.to_primitives(MM):
             poly = primitive.to_arc_poly()
             region = Region.from_arc_poly(poly)
             arc_poly_gbr.objects.append(region)
+
             # Regression test for gitlab issue #17
             assert primitive.polarity_dark == poly.polarity_dark
             assert region.polarity_dark == poly.polarity_dark
+
+            # Test for arc poly arc approximation, and regression test for gitlab issue #16
+            region = Region.from_arc_poly(poly.approximate_arcs())
+            arc_poly_approx_gbr.objects.append(region)
 
     arc_poly_svg = tmpfile('ArcPoly SVG Output', '.svg')
     with open(arc_poly_svg, 'w') as f:
@@ -68,6 +74,14 @@ def object_test(tmpfile, img_support, epsilon=1e-4):
 
     arc_poly_png = tmpfile('ArcPoly conversion render', '.png')
     img_support.svg_to_png(arc_poly_svg, arc_poly_png, dpi=300, bg='white')
+
+    # Arc approximation test
+    arc_poly_approx_svg = tmpfile('ArcPoly Approximation SVG Output', '.svg')
+    with open(arc_poly_approx_svg, 'w') as f:
+        f.write(str(arc_poly_approx_gbr.to_svg(force_bounds=bounds, arg_unit='inch', fg='black', bg='white')))
+
+    arc_poly_approx_png = tmpfile('ArcPoly Approximation conversion render', '.png')
+    img_support.svg_to_png(arc_poly_approx_svg, arc_poly_approx_png, dpi=300, bg='white')
 
     # Reference export via gerber through GerbV
     out_gbr = tmpfile('GBR Output', '.gbr')
@@ -92,6 +106,11 @@ def object_test(tmpfile, img_support, epsilon=1e-4):
     assert hist[3:].sum() < epsilon*hist.size
 
     mean, _max, hist = img_support.image_difference(out_png, arc_poly_png, diff_out=tmpfile('ArcPoly Difference', '.png'))
+    assert hist[9] < 1
+    assert mean < epsilon
+    assert hist[3:].sum() < epsilon*hist.size
+
+    mean, _max, hist = img_support.image_difference(out_png, arc_poly_approx_png, diff_out=tmpfile('ArcPoly Approximation Difference', '.png'))
     assert hist[9] < 1
     assert mean < epsilon
     assert hist[3:].sum() < epsilon*hist.size
