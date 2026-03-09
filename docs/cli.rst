@@ -60,6 +60,7 @@ layers, or whole board stacks (:py:class:`~.layers.LayerStack`) to SVG.
 
 ``gerbonara render`` renders one or more Gerber or Excellon files as a single SVG file. It can read single files,
 directorys of files, and ZIP files. To read directories or zips, it applies gerbonara's layer filename matching rules.
+These built-in rules should work with common settings in a wide variety of CAD tools.
 
 .. option:: --warnings [default|ignore|once]
 
