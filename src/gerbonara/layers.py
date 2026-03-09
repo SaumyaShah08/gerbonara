@@ -1315,7 +1315,7 @@ class LayerStack:
                     return
 
                 if (cur, i) in joins and joins[(cur, i)] != (nearest, j):
-                    warnings.warn(f'Three-way intersection on outline layer at: {(nearest, j)}; {(cur, i)}; and {joins[(nearest, j)]}. Falling back to returning the convex hull of the outline layer.{maybe_allegro_hint}')
+                    warnings.warn(f'Three-way intersection on outline layer at: {(nearest, j)}; {(cur, i)}; and {joins[(cur, i)]}. Falling back to returning the convex hull of the outline layer.{maybe_allegro_hint}')
                     yield list(convex_hull_to_lines(self.outline.instance.convex_hull(tol, unit), unit))
                     return
 

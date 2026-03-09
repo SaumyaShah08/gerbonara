@@ -26,7 +26,7 @@ import shutil
 from pathlib import Path
 from functools import cached_property
 
-from .utils import LengthUnit, MM, Inch, Tag, sum_bounds, setup_svg
+from .utils import LengthUnit, MM, Inch, Tag, sum_bounds, setup_svg, convex_hull
 from . import graphic_primitives as gp
 from . import graphic_objects as go
 
@@ -350,6 +350,24 @@ class CamFile:
         """
 
         return sum_bounds(( p.bounding_box(unit) for p in self.objects ), default=default)
+
+    def convex_hull(self, tol=0.01, unit=None):
+        unit = unit or self.unit
+        points = []
+
+        for obj in self.objects:
+            if isinstance(obj, go.Line):
+                line = obj.as_primitive(unit)
+                points.append((line.x1, line.y1))
+                points.append((line.x2, line.y2))
+
+            elif isinstance(obj, go.Arc):
+                for obj in obj.approximate(tol, unit):
+                    line = obj.as_primitive(unit)
+                    points.append((line.x1, line.y1))
+                    points.append((line.x2, line.y2))
+
+        return convex_hull(points)
 
     def to_excellon(self):
         """ Convert to a :py:class:`.ExcellonFile`. Returns ``self`` if it already is one. """

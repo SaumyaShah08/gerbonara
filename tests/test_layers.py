@@ -17,6 +17,7 @@
 #
 
 from pathlib import Path
+import tempfile
 
 import pytest
 
@@ -317,6 +318,18 @@ REFERENCE_DIRS = {
         'silk_screen_bottom.art': 'bottom silk',
         'silk_screen_top.art': 'top silk',
         },
+    'world_clock_2': {
+            'wc2-B_Cu.gbr': 'bottom copper',
+            'wc2-B_Mask.gbr': 'bottom mask',
+            'wc2-B_Paste.gbr': 'bottom paste',
+            'wc2-B_SilkS.gbr': 'bottom silk',
+            'wc2-Edge_Cuts.gbr': 'mechanical outline',
+            'wc2-F_Cu.gbr': 'top copper',
+            'wc2-F_Mask.gbr': 'top mask',
+            'wc2-F_Paste.gbr': 'top paste',
+            'wc2-F_SilkS.gbr': 'top silk',
+            'wc2.kicad_pcb': None,
+        },
     }
 
 @filter_syntax_warnings
@@ -358,4 +371,14 @@ def test_layer_classifier(ref_dir, file_map):
     for layer in stack.drill_layers:
         if 'upverter' not in ref_dir:
             assert isinstance(layer, ExcellonFile)
+
+
+@filter_syntax_warnings
+@pytest.mark.parametrize('ref_dir', list(REFERENCE_DIRS))
+def test_pretty_svg_export(ref_dir):
+    """ Tests the basic functionality of to_pretty_svg """
+    path = reference_path(ref_dir)
+    stack = LayerStack.open_dir(path)
+    with tempfile.NamedTemporaryFile(suffix='.svg') as f:
+        stack.to_pretty_svg()
 

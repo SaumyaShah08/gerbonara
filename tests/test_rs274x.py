@@ -301,6 +301,15 @@ REFERENCE_FILES = [ l.strip() for l in '''
     kicad-x2-tests/x2noap/Flashpads-F_Mask.gbr
     kicad-x2-tests/x2noap/Flashpads-F_Paste.gbr
     kicad-x2-tests/x2noap/Flashpads-F_Silkscreen.gbr
+    world_clock_2/wc2-B_Cu.gbr
+    world_clock_2/wc2-B_Mask.gbr
+    world_clock_2/wc2-B_Paste.gbr
+    world_clock_2/wc2-B_SilkS.gbr
+    world_clock_2/wc2-Edge_Cuts.gbr
+    world_clock_2/wc2-F_Cu.gbr
+    world_clock_2/wc2-F_Mask.gbr
+    world_clock_2/wc2-F_Paste.gbr
+    world_clock_2/wc2-F_SilkS.gbr
     gerbv.gbr
 '''.splitlines() if l ]
 
