@@ -62,6 +62,12 @@ class GraphicPrimitive:
 
         raise NotImplementedError()
 
+    def is_zero_size(self):
+        """ Return whether this primitive is zero size
+
+        :rtype: bool
+        """
+
 
 @dataclass(frozen=True)
 class Circle(GraphicPrimitive):
@@ -83,6 +89,9 @@ class Circle(GraphicPrimitive):
         return ArcPoly([(self.x-self.r, self.y), (self.x+self.r, self.y)],
                        [(True, (self.x, self.y)), (True, (self.x, self.y))],
                        polarity_dark=self.polarity_dark)
+
+    def is_zero_size(self):
+        return math.isclose(self.r, 0)
 
 
 @dataclass(frozen=True)
@@ -180,6 +189,20 @@ class ArcPoly(GraphicPrimitive):
         return self
 
 
+    def is_zero_size(self):
+        for (x1, y1), (x2, y2), (clockwise, (cx, cy)) in self.segments:
+            if clockwise is not None: # arc
+                if math.isclose(cx, x1) and math.isclose(cy, y1):
+                    continue
+                
+                if math.isclose(x1, x2) and math.isclose(y1, y2):
+                    return False
+
+        if math.isclose(polygon_area(self.outline), 0):
+            return True
+        return False
+
+
 @dataclass(frozen=True)
 class Line(GraphicPrimitive):
     """ Straight line with round end caps. """
@@ -243,6 +266,9 @@ class Line(GraphicPrimitive):
                     (True, (self.x1, self.y1)),
                     None,
                 ], polarity_dark=self.polarity_dark)
+
+    def is_zero_size(self):
+        return math.isclose(self.x1, self.x2) and math.isclose(self.y1, self.y2)
 
 
 @dataclass(frozen=True)
@@ -310,6 +336,9 @@ class Arc(GraphicPrimitive):
                     (not self.clockwise, (self.cx, self.cy)),
                 ], polarity_dark=self.polarity_dark)
 
+    def is_zero_size(self):
+        return False # an arc with identical start and end points is defined as a circle
+
 
 @dataclass(frozen=True)
 class Rectangle(GraphicPrimitive):
@@ -344,4 +373,7 @@ class Rectangle(GraphicPrimitive):
         x, y = self.x - self.w/2, self.y - self.h/2
         return tag('rect', x=prec(x), y=prec(y), width=prec(self.w), height=prec(self.h),
                 **svg_rotation(self.rotation, self.x, self.y), fill=color)
+
+    def is_zero_size(self):
+        return math.isclose(self.w, 0) or math.isclose(self.h, 0)
 

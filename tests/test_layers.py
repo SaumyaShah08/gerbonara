@@ -330,10 +330,12 @@ REFERENCE_DIRS = {
             'wc2-F_SilkS.gbr': 'top silk',
             'wc2.kicad_pcb': None,
         },
+    'zero-length-lines': {
+            }
     }
 
 @filter_syntax_warnings
-@pytest.mark.parametrize('ref_dir,file_map', list(REFERENCE_DIRS.items()))
+@pytest.mark.parametrize('ref_dir,file_map', [(k, v) for k, v in REFERENCE_DIRS.items() if v])
 def test_layer_classifier(ref_dir, file_map):
     path = reference_path(ref_dir)
     print('Reference path is', path)

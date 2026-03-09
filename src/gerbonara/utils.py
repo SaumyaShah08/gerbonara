@@ -605,6 +605,18 @@ def point_in_polygon(point, poly):
     return res
 
 
+def polygon_area(poly):
+    # https://en.wikipedia.org/wiki/Shoelace_formula
+
+    if not poly or len(poly) < 3:
+        return 0
+
+    acc = 0
+    for (x1, y1), (x2, y2) in zip(poly, poly[-1:] + poly):
+        acc += (y1 + y2) * (x1 - x2)
+    return acc/2
+
+
 def bbox_intersect(a, b):
     if a is None or b is None:
         return False
