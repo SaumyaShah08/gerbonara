@@ -217,7 +217,7 @@ class Polygon(Primitive):
             rotation += deg_to_rad(calc.rotation)
             x, y = rotate_point(calc.x, calc.y, -rotation, 0, 0)
             x, y = x+offset[0], y+offset[1]
-            return [ gp.ArcPoly.from_regular_polygon(calc.x, calc.y, calc.diameter/2, calc.n_vertices, rotation,
+            return [ gp.ArcPoly.from_regular_polygon(x, y, calc.diameter/2, calc.n_vertices, rotation,
                         polarity_dark=(bool(calc.exposure) == polarity_dark)) ]
 
     def dilated(self, offset, unit):
